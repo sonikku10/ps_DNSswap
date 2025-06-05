@@ -14,7 +14,7 @@ $targetServersFQDN = @() #The ACTUAL server hostnames
 $serverIPs = @( @("primaryIP1", "primaryIP2", "etc"), @("secondaryIP1", "secondaryIP2", "etc")
               
 $lastOctets = @()
-$reverseZone = @("0.0.10.in-addr.arpa","0.1.10.in-addr.arpa")  #Primary First here as well
+$reverseZone = @("0.0.10.in-addr.arpa","0.1.10.in-addr.arpa")  #Example to show primary first zone should go first here as well
 
 # Functions to update records using nsupdate command
 function forwardRecords {
