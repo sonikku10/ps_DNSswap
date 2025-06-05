@@ -22,11 +22,11 @@ function forwardRecords {
   $nsupdateCommand = @"
 server $dnsServer
 zone <forwardDnsZone>
-update add $($targetServersAlias[$i].contoso 600 A $($serverIPs[$j])
+update add $($targetServersAlias[$i]).contoso 600 A $($serverIPs[$j])
 send
 "@
   $nsupdateCommand | nsupdate
-  "$time $($targetServersAlias[$i].contoso -> $($serverIPs[$j]) DNS A Record Added." | Out-File -FilePath $OutputFile -Append
+  "$time $($targetServersAlias[$i]).contoso -> $($serverIPs[$j]) DNS A Record Added." | Out-File -FilePath $OutputFile -Append
 }
 
 function reverseRecords {
