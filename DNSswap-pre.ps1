@@ -3,7 +3,7 @@
 
 #for your log file
 $OutputPath = <local file/directory>
-$OutputFile = "$OutputPath/dir/file.log>"
+$OutputFile = "$OutputPath/dir/file.log"
 
 $time = Get-Date
 
@@ -11,7 +11,7 @@ $dnsServer = ""
 $targetServerAlias = @() #Optional: Use if servers have use an additional host record under an alternate name
 $targetServersFQDN = @()
 $lastOctets = @()
-$reverseZone = @("0.0.10.in-addr.arpa","0.1.10.in-addr.arpa")  #Primary First here as well
+$reverseZone = @("0.0.10.in-addr.arpa","0.1.10.in-addr.arpa")  #Example to show primary first zone should go first here as well
 
 #Use dig to pull list of PTR records
 $PTRRecordsPrimary = dig AXFR $reverseZone[0] @$dnsServer +short
