@@ -3,7 +3,7 @@
 
 #for your log file
 $OutputPath = <local file/directory>
-$OutputFile = "$OutputPath/dir/file.log>
+$OutputFile = "$OutputPath/dir/file.log>"
 
 $time = Get-Date
 
