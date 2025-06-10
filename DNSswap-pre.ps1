@@ -14,8 +14,8 @@ $lastOctets = @()
 $reverseZone = @("0.0.10.in-addr.arpa","0.1.10.in-addr.arpa")  #Example to show primary first zone should go first here as well
 
 #Use dig to pull list of PTR records
-$PTRRecordsPrimary = & dig AXFR $reverseZone[0] @$dnsServer +short
-$PTRRecordsSecondary = & dig AXFR $reverseZone[1] @$dnsServer +short
+$PTRRecordsPrimary = &"dig" AXFR $reverseZone[0] @$dnsServer +short
+$PTRRecordsSecondary = &"dig" AXFR $reverseZone[1] @$dnsServer +short
 
 # Functions to remove current records using nsupdate command
 function forwardRecords {
@@ -26,7 +26,7 @@ zone <forwardDnsZone>
 update delete $_
 send
 "@
-  $nsupdateCommand | nsupdate
+  $nsupdateCommand | &"nsupdate"
 }
 
 function reverseRecords {
@@ -35,7 +35,7 @@ server $dnsServer
 update delete $_.$reverseZone
 send
 "@
-  $nsupdateCommand | nsupdate
+  $nsupdateCommand | &"nsupdate"
 }
 
 #The ACTUAL Failover/Failback Functions
