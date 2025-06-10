@@ -25,7 +25,7 @@ zone <forwardDnsZone>
 update add $($targetServersAlias[$i]).contoso 600 A $($serverIPs[$j])
 send
 "@
-  $nsupdateCommand | nsupdate
+  $nsupdateCommand | &"nsupdate"
   "$time $($targetServersAlias[$i]).contoso -> $($serverIPs[$j]) DNS A Record Added." | Out-File -FilePath $OutputFile -Append
 }
 
@@ -35,7 +35,7 @@ server $dnsServer
 update add $($lastOctets[$i]).$($reverseZone) 600 PTR $($targetServersFQDN[$j])
 send
 "@
-  $nsupdateCommand | nsupdate
+  $nsupdateCommand | &"nsupdate"
   "$time $(lastOctets[$i]).$($reverseZone) -> $(targetServerFQDN[$j]) DNS PTR Record Added." | Out-File -FilePath $OutputFile -Append
 }
 
@@ -66,7 +66,7 @@ function AddDNSRecordsSecondary {
 function pingPrimary {
 $allSuccess = $true
     @($serverIPs[1] | ForEach-Object -Process { 
-        $pingResult = & ping -c 1 $_
+        $pingResult = &"ping" -c 1 $_
             if ($? -ne 0) {
                 "$time Ping failed for: $_" | Out-File -Path $OutputFile -Append
                 $allSuccess = $false
@@ -85,7 +85,7 @@ $allSuccess = $true
 function pingSecondary {
 $allSuccess = $true
     @($serverIPs[1] | ForEach-Object -Process { 
-        $pingResult = & ping -c 1 $_
+        $pingResult = &"ping" -c 1 $_
             if ($? -ne 0) {
                 "$time Ping failed for: $_" | Out-File -Path $OutputFile -Append
                 $allSuccess = $false
