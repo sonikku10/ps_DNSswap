@@ -25,7 +25,7 @@ zone <forwardDnsZone>
 update add $($targetServersAlias[$i]).contoso 600 A $($serverIPs[$j])
 send
 "@
-  $nsupdateCommand | nsupdate
+  $nsupdateCommand | &"nsupdate"
   "$time $($targetServersAlias[$i]).contoso -> $($serverIPs[$j]) DNS A Record Added." | Out-File -FilePath $OutputFile -Append
 }
 
@@ -35,7 +35,7 @@ server $dnsServer
 update add $($lastOctets[$i]).$($reverseZone) 600 PTR $($targetServersFQDN[$j])
 send
 "@
-  $nsupdateCommand | nsupdate
+  $nsupdateCommand | &"nsupdate"
   "$time $(lastOctets[$i]).$($reverseZone) -> $(targetServerFQDN[$j]) DNS PTR Record Added." | Out-File -FilePath $OutputFile -Append
 }
 
@@ -62,19 +62,58 @@ function AddDNSRecordsSecondary {
   "$time Site/Application in FAILOVER STATUS." | Out-File -FilePath $OutputFile -Append
 }
 
+#Split off ping functions to get result code and avoid crowding the actual run part
+function pingPrimary {
+$allSuccess = $true
+    @($serverIPs[1] | ForEach-Object -Process { 
+        $pingResult = &"ping" -c 1 $_
+            if ($? -ne 0) {
+                "$time Ping failed for: $_" | Out-File -Path $OutputFile -Append
+                $allSuccess = $false
+            } else {
+                "$time Ping succeeded for: $_" | Out-File -Path $OutputFile -Append
+            }
+        }
+    )
+    if ($allSuccess) {
+        return $allSuccess
+    } else {
+        exit 1  
+    }
+}
+
+function pingSecondary {
+$allSuccess = $true
+    @($serverIPs[1] | ForEach-Object -Process { 
+        $pingResult = &"ping" -c 1 $_
+            if ($? -ne 0) {
+                "$time Ping failed for: $_" | Out-File -Path $OutputFile -Append
+                $allSuccess = $false
+            } else {
+                "$time Ping succeeded for: $_" | Out-File -Path $OutputFile -Append
+            }
+        }
+    )
+    if ($allSuccess) {
+        return $allSuccess
+    } else {
+        exit 1  
+    }
+}
+
 # Running the functions
 # Ping IP to determine where server is located
 "$time Checking for server location..." | Out-File -FilePath $OutputFile -Append
-$serverPING = @($serverIPs[0] | ForEach-Object -Process { (Test-Connection $_).Status }) #Because no Test-NetConnection in Linux PWSH
-if ($serverPING -contains "Success") {
+$pingResult = pingPrimary
+if ($pingResult) {
   "$time Servers Pingable at PRIMARY SITE. Adding DNS Entries..." | Out-File -FilePath $OutputFile -Append
   $serverIPs = $serverIPs[0]
   $reverseZone = $reverseZone[0]
   AddDnsRecordsPrimary
 }
 else {
-  $serverPing = @($serverIPs[1] | ForEach-Object -Process { (Test-Connection $_).Status })
-  if ($serverPING -contains "Success") {
+  $pingResult = pingSecondary
+  if ($pingResult) {
     "$time Servers Pingable at SECONDARY SITE. Adding DNS Entries..." | Out-File -FilePath $OutputFile -Append
     $serverIPs = $serverIPs[1]
     $reverseZone = $reverseZone[1]
